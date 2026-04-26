@@ -1,144 +1,122 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Memory Vault</title>
-  <meta name="theme-color" content="#000000" />
-  <style>
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      background:#090c10;
-      color:#fff;
-      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-    }
-
-    header{
-      padding:22px 24px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-    }
-
-    h1{
-      margin:0;
-      font-size:1.05rem;
-      font-weight:600;
-      letter-spacing:.08em;
-    }
-
-    .btn{
-      background:#111;
-      border:1px solid rgba(255,255,255,.12);
-      color:#fff;
-      padding:10px 14px;
-      border-radius:14px;
-      cursor:pointer;
-    }
-
-    .btn:hover{
-      background:#1a1a1a;
-    }
-
-    main{
-      max-width:1100px;
-      margin:auto;
-      padding:24px;
-    }
-
-    .upload-box{
-      display:none;
-      gap:12px;
-      align-items:center;
-      margin-bottom:24px;
-      padding:18px;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:22px;
-      background:#0a0a0a;
-      flex-wrap:wrap;
-    }
-
-    .comment-input{
-      flex:1;
-      min-width:180px;
-      background:#111;
-      border:1px solid rgba(255,255,255,.08);
-      color:#fff;
-      padding:10px 14px;
-      border-radius:14px;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-      gap:18px;
-    }
-
-    .card{
-      background:#0b0b0b;
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:24px;
-      overflow:hidden;
-      box-shadow:0 10px 30px rgba(0,0,0,.35);
-    }
-
-    .card img{
-      width:100%;
-      aspect-ratio:4/5;
-      object-fit:contain;
-      background:#000;
-      display:block;
-      cursor:pointer;
-    }
-
-    .meta{
-      padding:14px;
-    }
-
-    .date{
-      font-size:.82rem;
-      color:#aaa;
-      margin-bottom:8px;
-    }
-
-    .actions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size:.9rem;
-      color:#ddd;
-    }
-
-    .empty{
-      text-align:center;
-      color:#888;
-      padding:70px 0;
-    }
-
-    .lightbox{
-      position:fixed;
-      inset:0;
-      background:rgba(0,0,0,.94);
-      display:none;
-      justify-content:center;
-      align-items:center;
-      padding:20px;
-      z-index:999;
-    }
-
-    .lightbox img{
-      max-width:100%;
-      max-height:100%;
-      width:auto;
-      height:auto;
-      object-fit:contain;
-      border-radius:18px;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memory Vault</title>
+<meta name="theme-color" content="#0d1117">
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+}
+header{
+  padding:20px 24px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#0d1117;
+  border-bottom:1px solid #30363d;
+}
+h1{
+  margin:0;
+  font-size:1rem;
+  letter-spacing:.08em;
+}
+.btn{
+  background:#161b22;
+  color:#fff;
+  border:1px solid #30363d;
+  padding:10px 14px;
+  border-radius:12px;
+  cursor:pointer;
+}
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px;
+}
+.upload-box{
+  display:none;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:24px;
+}
+.comment-input{
+  flex:1;
+  min-width:180px;
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  padding:10px 12px;
+  border-radius:12px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+}
+@media(min-width:900px){
+  .grid{
+    grid-template-columns:repeat(5,1fr);
+  }
+}
+.card{
+  background:#0b0b0b;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:20px;
+  overflow:hidden;
+}
+.card img{
+  width:100%;
+  aspect-ratio:4/5;
+  object-fit:contain;
+  background:#000;
+  cursor:pointer;
+}
+.meta{
+  padding:12px;
+}
+.date{
+  font-size:.75rem;
+  color:#888;
+  margin-bottom:8px;
+}
+.actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  font-size:.85rem;
+}
+.pagination{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top:24px;
+}
+.lightbox{
+  position:fixed;
+  inset:0;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  background:rgba(0,0,0,.94);
+  padding:20px;
+  z-index:999;
+}
+.lightbox img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  border-radius:18px;
+}
+</style>
 </head>
 <body>
+
 <header>
   <h1>MEMORY VAULT</h1>
   <button id="loginBtn" class="btn">Google 로그인</button>
@@ -146,16 +124,21 @@
 
 <main>
   <div id="uploadBox" class="upload-box">
-    <input id="fileInput" type="file" accept="image/*" />
-    <input id="commentInput" type="text" maxlength="60" placeholder="짧은 코멘트" class="comment-input" />
-    <button id="uploadBtn" class="btn">사진 올리기</button>
+    <input id="fileInput" type="file" accept="image/*">
+    <input id="commentInput" class="comment-input" maxlength="60" placeholder="짧은 코멘트">
+    <button id="uploadBtn" class="btn">올리기</button>
   </div>
 
   <div id="gallery" class="grid"></div>
+
+  <div class="pagination">
+    <button id="prevBtn" class="btn">이전</button>
+    <button id="nextBtn" class="btn">다음</button>
+  </div>
 </main>
 
 <div id="lightbox" class="lightbox">
-  <img id="lightboxImg" src="" alt="">
+  <img id="lightboxImg">
 </div>
 
 <script type="module">
@@ -178,89 +161,121 @@ const storage = getStorage(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-let currentUser = null;
+let currentUser=null;
+let allPhotos=[];
+let currentPage=0;
+const pageSize=10;
 
-const loginBtn = document.getElementById('loginBtn');
-const uploadBox = document.getElementById('uploadBox');
-const fileInput = document.getElementById('fileInput');
-const commentInput = document.getElementById('commentInput');
-const uploadBtn = document.getElementById('uploadBtn');
-const gallery = document.getElementById('gallery');
-const lightbox = document.getElementById('lightbox');
-const lightboxImg = document.getElementById('lightboxImg');
+const loginBtn=document.getElementById('loginBtn');
+const uploadBox=document.getElementById('uploadBox');
+const fileInput=document.getElementById('fileInput');
+const commentInput=document.getElementById('commentInput');
+const uploadBtn=document.getElementById('uploadBtn');
+const gallery=document.getElementById('gallery');
+const lightbox=document.getElementById('lightbox');
+const lightboxImg=document.getElementById('lightboxImg');
 
-loginBtn.onclick = async () => {
-  currentUser ? await signOut(auth) : await signInWithPopup(auth, provider);
-};
+loginBtn.onclick=()=>currentUser?signOut(auth):signInWithPopup(auth,provider);
 
-onAuthStateChanged(auth, user => {
-  currentUser = user;
-  loginBtn.textContent = user ? '로그아웃' : 'Google 로그인';
-  uploadBox.style.display = user ? 'flex' : 'none';
+onAuthStateChanged(auth,user=>{
+  currentUser=user;
+  loginBtn.textContent=user?'로그아웃':'Google 로그인';
+  uploadBox.style.display=user?'flex':'none';
   loadGallery();
 });
 
-uploadBtn.onclick = async () => {
-  const file = fileInput.files[0];
-  if (!file || !currentUser) return;
+function makeThumbnail(file,maxSize=500){
+  return new Promise(resolve=>{
+    const img=new Image();
+    const reader=new FileReader();
+    reader.onload=e=>{
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        let {width,height}=img;
+        if(width>height){
+          if(width>maxSize){height*=maxSize/width;width=maxSize;}
+        }else{
+          if(height>maxSize){width*=maxSize/height;height=maxSize;}
+        }
+        canvas.width=width;
+        canvas.height=height;
+        canvas.getContext('2d').drawImage(img,0,0,width,height);
+        canvas.toBlob(resolve,'image/jpeg',0.75);
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
-  const path = `photos/${Date.now()}_${file.name}`;
-  const storageRef = ref(storage, path);
+uploadBtn.onclick=async()=>{
+  const file=fileInput.files[0];
+  if(!file||!currentUser)return;
 
-  await uploadBytes(storageRef, file);
-  const url = await getDownloadURL(storageRef);
+  const id=Date.now();
+  const originalRef=ref(storage,`photos/${id}_${file.name}`);
+  const thumbRef=ref(storage,`thumbs/${id}_${file.name}`);
 
-  await addDoc(collection(db, 'photos'), {
+  await uploadBytes(originalRef,file);
+
+  const thumbBlob=await makeThumbnail(file);
+  await uploadBytes(thumbRef,thumbBlob);
+
+  const url=await getDownloadURL(originalRef);
+  const thumbUrl=await getDownloadURL(thumbRef);
+
+  await addDoc(collection(db,'photos'),{
     url,
-    path,
-    comment: commentInput.value.trim(),
-    createdAt: Date.now(),
-    ownerUid: currentUser.uid
+    thumbUrl,
+    pathOriginal:originalRef.fullPath,
+    pathThumb:thumbRef.fullPath,
+    comment:commentInput.value.trim(),
+    createdAt:Date.now(),
+    ownerUid:currentUser.uid
   });
 
-  fileInput.value = '';
-  commentInput.value = '';
+  fileInput.value='';
+  commentInput.value='';
   loadGallery();
 };
 
-async function loadGallery() {
-  gallery.innerHTML = '';
+async function loadGallery(){
+  const q=query(collection(db,'photos'),orderBy('createdAt','desc'));
+  const snap=await getDocs(q);
+  allPhotos=snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderPage();
+}
 
-  const q = query(collection(db, 'photos'), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
+function renderPage(){
+  gallery.innerHTML='';
+  const start=currentPage*pageSize;
+  const items=allPhotos.slice(start,start+pageSize);
 
-  if (snap.empty) {
-    gallery.innerHTML = '<div class="empty">아직 등록된 사진이 없습니다.</div>';
-    return;
-  }
-
-  snap.forEach(item => {
-    const data = item.data();
-    const canEdit = currentUser && currentUser.uid === data.ownerUid;
-
-    const card = document.createElement('div');
-    card.className = 'card';
-
-    card.innerHTML = `
-      <img src="${data.url}" alt="memory">
+  items.forEach(data=>{
+    const canEdit=currentUser&&currentUser.uid===data.ownerUid;
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`
+      <img src="${data.thumbUrl}" alt="">
       <div class="meta">
         <div class="date">${new Date(data.createdAt).toLocaleDateString('ko-KR')}</div>
         <div class="actions">
-          ${canEdit ? '<button class="btn delete-btn">삭제</button>' : ''}
-          <span>${data.comment || ''}</span>
+          ${canEdit?'<button class="btn delete-btn">삭제</button>':''}
+          <span>${data.comment||''}</span>
         </div>
       </div>
     `;
 
-    card.querySelector('img').onclick = () => {
-      lightboxImg.src = data.url;
-      lightbox.style.display = 'flex';
+    card.querySelector('img').onclick=()=>{
+      lightboxImg.src=data.url;
+      lightbox.style.display='flex';
     };
 
-    if (canEdit) {
-      card.querySelector('.delete-btn').onclick = async () => {
-        await deleteObject(ref(storage, data.path));
-        await deleteDoc(doc(db, 'photos', item.id));
+    if(canEdit){
+      card.querySelector('.delete-btn').onclick=async()=>{
+        await deleteObject(ref(storage,data.pathOriginal));
+        await deleteObject(ref(storage,data.pathThumb));
+        await deleteDoc(doc(db,'photos',data.id));
         loadGallery();
       };
     }
@@ -269,9 +284,15 @@ async function loadGallery() {
   });
 }
 
-lightbox.onclick = () => {
-  lightbox.style.display = 'none';
+document.getElementById('prevBtn').onclick=()=>{
+  if(currentPage>0){currentPage--;renderPage();}
 };
+
+document.getElementById('nextBtn').onclick=()=>{
+  if((currentPage+1)*pageSize<allPhotos.length){currentPage++;renderPage();}
+};
+
+lightbox.onclick=()=>lightbox.style.display='none';
 </script>
 </body>
 </html>
