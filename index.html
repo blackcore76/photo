@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Memory Vault</title>
+  <meta name="theme-color" content="#000000" />
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#000;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+    header{padding:22px 24px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;justify-content:space-between;align-items:center}
+    h1{margin:0;font-size:1.05rem;font-weight:600;letter-spacing:.08em}
+    .btn{background:#111;border:1px solid rgba(255,255,255,.12);color:#fff;padding:10px 14px;border-radius:14px;cursor:pointer}
+    .btn:hover{background:#1a1a1a}
+    main{max-width:1100px;margin:auto;padding:24px}
+    .upload-box{display:none;gap:12px;align-items:center;margin-bottom:24px;padding:18px;border:1px solid rgba(255,255,255,.08);border-radius:22px;background:#0a0a0a}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+    .card{background:#0b0b0b;border:1px solid rgba(255,255,255,.08);border-radius:24px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.35)}
+    .card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+    .meta{padding:14px}
+    .date{font-size:.82rem;color:#aaa}
+    .actions{display:flex;gap:8px;margin-top:12px}
+    .empty{text-align:center;color:#888;padding:70px 0}
+  </style>
+</head>
+<body>
+<header>
+  <h1>MEMORY VAULT</h1>
+  <button id="loginBtn" class="btn">Google 로그인</button>
+</header>
+
+<main>
+  <div id="uploadBox" class="upload-box">
+    <input id="fileInput" type="file" accept="image/*" />
+    <button id="uploadBtn" class="btn">사진 올리기</button>
+  </div>
+  <div id="gallery" class="grid"></div>
+</main>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+import { getFirestore, collection, addDoc, getDocs, orderBy, query, deleteDoc, doc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: 'YOUR_API_KEY',
+  authDomain: 'YOUR_PROJECT.firebaseapp.com',
+  projectId: 'YOUR_PROJECT_ID',
+  storageBucket: 'YOUR_PROJECT.appspot.com',
+  appId: 'YOUR_APP_ID'
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const storage = getStorage(app);
+const db = getFirestore(app);
+const provider = new GoogleAuthProvider();
+
+let currentUser = null;
+const loginBtn = document.getElementById('loginBtn');
+const uploadBox = document.getElementById('uploadBox');
+const fileInput = document.getElementById('fileInput');
+const uploadBtn = document.getElementById('uploadBtn');
+const gallery = document.getElementById('gallery');
+
+loginBtn.onclick = async () => {
+  currentUser ? await signOut(auth) : await signInWithPopup(auth, provider);
+};
+
+onAuthStateChanged(auth, user => {
+  currentUser = user;
+  loginBtn.textContent = user ? '로그아웃' : 'Google 로그인';
+  uploadBox.style.display = user ? 'flex' : 'none';
+  loadGallery();
+});
+
+uploadBtn.onclick = async () => {
+  const file = fileInput.files[0];
+  if (!file || !currentUser) return;
+  const path = `photos/${Date.now()}_${file.name}`;
+  const storageRef = ref(storage, path);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  await addDoc(collection(db, 'photos'), {
+    url, path,
+    createdAt: Date.now(),
+    ownerUid: currentUser.uid
+  });
+  fileInput.value = '';
+  loadGallery();
+};
+
+async function loadGallery(){
+  gallery.innerHTML = '';
+  const q = query(collection(db, 'photos'), orderBy('createdAt', 'desc'));
+  const snap = await getDocs(q);
+  if (snap.empty) {
+    gallery.innerHTML = '<div class="empty">아직 등록된 사진이 없습니다.</div>';
+    return;
+  }
+
+  snap.forEach(item => {
+    const data = item.data();
+    const canEdit = currentUser && currentUser.uid === data.ownerUid;
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `
+      <img src="${data.url}" alt="memory">
+      <div class="meta">
+        <div class="date">${new Date(data.createdAt).toLocaleDateString('ko-KR')}</div>
+        ${canEdit ? `<div class="actions"><button class="btn delete-btn">삭제</button></div>` : ''}
+      </div>`;
+
+    if (canEdit) {
+      card.querySelector('.delete-btn').onclick = async () => {
+        await deleteObject(ref(storage, data.path));
+        await deleteDoc(doc(db, 'photos', item.id));
+        loadGallery();
+      };
+    }
+
+    gallery.appendChild(card);
+  });
+}
+</script>
+</body>
+</html>
